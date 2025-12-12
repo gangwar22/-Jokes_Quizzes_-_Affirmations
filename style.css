@@ -1,0 +1,17 @@
+:root {
+    --app-font: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
+}
+
+body {
+    font-family: var(--app-font);
+}
+
+/* Slow rotation for the sparkle icon */
+.slow-spin {
+    animation: spin 6s linear infinite;
+}
+
+
+.project-section.hidden {
+    display: none;
+}

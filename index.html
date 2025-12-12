@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fun Hub: Jokes, Quizzes & Affirmations</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="app.js" defer></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold text-white text-center mb-2">AI Fun Hub: Jokes, Quizzes & Affirmations</h1>
+        <p class="text-purple-200 text-center mb-8">Three mini tools: jokes by category, MCQ quizzes on any topic, and daily affirmations</p>
+
+        <!-- API Key Input -->
+        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-white/20">
+            <h2 class="text-xl font-semibold text-white mb-3">🔑 API Configuration</h2>
+            <div class="flex gap-3">
+                <input 
+                    type="password" 
+                    id="apiKeyInput" 
+                    placeholder="Enter your Gemini API key..."
+                    class="flex-1 px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                >
+                <button 
+                    id="saveApiKey"
+                    class="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all"
+                >
+                    Save Key
+                </button>
+            </div>
+            <p id="apiStatus" class="text-sm text-purple-300 mt-2"></p>
+        </div>
+
+        <!-- Projects Dashboard -->
+        <div id="projectsDashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 bg-white/5 backdrop-blur rounded-2xl p-8 border border-white/10">
+            <button class="project-teaser bg-gradient-to-r from-yellow-400/20 via-orange-400/20 backdrop-blur-xl rounded-3xl p-8 border-2 border-yellow-400/30 hover:border-yellow-400 hover:from-yellow-500/30 hover:to-orange-500/30 hover:scale-[1.02] transition-all duration-300 shadow-2xl hover:shadow-yellow-500/20 text-center flex flex-col items-center justify-center min-h-[220px] text-white" data-project="joke">
+                <span class="text-6xl mb-6 animate-bounce">😂</span>
+                <h3 class="text-2xl font-bold mb-3 drop-shadow-2xl">AI Joke Generator</h3>
+                <p class="text-purple-200 text-lg max-w-[200px] leading-relaxed">Get clean, funny jokes by category!</p>
+            </button>
+            <button class="project-teaser bg-gradient-to-r from-green-400/20 via-teal-400/20 backdrop-blur-xl rounded-3xl p-8 border-2 border-green-400/30 hover:border-green-400 hover:from-green-500/30 hover:to-teal-500/30 hover:scale-[1.02] transition-all duration-300 shadow-2xl hover:shadow-emerald-500/20 text-center flex flex-col items-center justify-center min-h-[220px] text-white" data-project="quiz">
+                <span class="text-6xl mb-6 animate-pulse">🧠</span>
+                <h3 class="text-2xl font-bold mb-3 drop-shadow-2xl">5-MCQ Quiz Generator</h3>
+                <p class="text-purple-200 text-lg max-w-[200px] leading-relaxed">Generate quizzes in multiple languages!</p>
+            </button>
+            <button class="project-teaser bg-gradient-to-r from-pink-500/20 via-purple-500/20 backdrop-blur-xl rounded-3xl p-8 border-2 border-pink-400/30 hover:border-pink-400 hover:from-pink-600/30 hover:to-purple-600/30 hover:scale-[1.02] transition-all duration-300 shadow-2xl hover:shadow-pink-500/20 text-center flex flex-col items-center justify-center min-h-[220px] text-white" data-project="affirmation">
+                <span class="text-6xl mb-6 animate-spin slow-spin">✨</span>
+                <h3 class="text-2xl font-bold mb-3 drop-shadow-2xl">Daily Positive Affirmation</h3>
+                <p class="text-purple-200 text-lg max-w-[200px] leading-relaxed">Uplifting daily motivation!</p>
+            </button>
+        </div>
+
+        <!-- Project 1: AI Joke Generator -->
+        <div id="jokeSection" class="project-section bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-white/20 hidden">
+            <button class="back-btn mb-6 px-6 py-3 w-full bg-white/20 backdrop-blur border border-white/30 text-white font-semibold rounded-xl hover:bg-white/30 hover:border-white/40 transition-all shadow-md hover:shadow-lg flex items-center gap-3 justify-center sm:justify-start sm:w-auto">← Back to Projects</button>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">😂</span>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">AI Joke Generator</h2>
+                    <p class="text-purple-200 text-sm">Uses: const, arrow functions, template literals, fetch()</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-3 mb-4 flex-wrap items-end">
+                <input 
+                    type="text"
+                    id="jokeTopic"
+                    placeholder="Enter any topic (e.g., JavaScript, cats, space)..."
+                    aria-label="Joke topic"
+                    class="flex-1 px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-400 min-w-[240px]"
+                >
+                <button 
+                    id="getJokeBtn"
+                    class="px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-bold rounded-xl hover:from-yellow-500 hover:to-orange-600 transition-all transform hover:scale-105"
+                >
+                    🎭 Get a Joke!
+                </button>
+            </div>
+            
+            <div id="jokeDisplay" class="bg-white/10 rounded-xl p-5 min-h-24 flex items-center justify-center">
+                <p class="text-white text-lg text-center italic">Click the button to get a joke!</p>
+            </div>
+        </div>
+
+        <!-- Project 2: 5-MCQ Quiz Generator -->
+        <div id="quizSection" class="project-section bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-white/20 hidden">
+            <button class="back-btn mb-6 px-6 py-3 w-full bg-white/20 backdrop-blur border border-white/30 text-white font-semibold rounded-xl hover:bg-white/30 hover:border-white/40 transition-all shadow-md hover:shadow-lg flex items-center gap-3 justify-center sm:justify-start sm:w-auto">← Back to Projects</button>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🧠</span>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">5-MCQ Quiz Generator</h2>
+                    <p class="text-purple-200 text-sm">Uses: let/const, arrays (.map(), .reduce()), Object.entries(), template literals, fetch(), destructuring</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-3 mb-4 flex-wrap items-end">
+                <input 
+                    type="text" 
+                    id="quizTopic" 
+                    placeholder="Enter a topic (e.g., Photosynthesis, JavaScript, History)..."
+                    class="flex-1 px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 min-w-[250px]"
+                >
+                <button 
+                    id="getQuizBtn"
+                    class="px-6 py-3 bg-gradient-to-r from-green-400 to-teal-500 text-gray-900 font-bold rounded-xl hover:from-green-500 hover:to-teal-600 transition-all transform hover:scale-105"
+                >
+                    📝 Generate 5-MCQ Quiz
+                </button>
+            </div>
+            
+            <div id="quizContainer" class="bg-white/10 rounded-xl p-6 min-h-[600px]">
+                <div class="text-center text-purple-200 italic py-[150px]">Choose a language, enter a topic, and generate your 5-MCQ quiz!</div>
+            </div>
+        </div>
+
+        <!-- Project 3: Daily Affirmation -->
+        <div id="affirmationSection" class="project-section bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hidden">
+            <button class="back-btn mb-6 px-6 py-3 w-full bg-white/20 backdrop-blur border border-white/30 text-white font-semibold rounded-xl hover:bg-white/30 hover:border-white/40 transition-all shadow-md hover:shadow-lg flex items-center gap-3 justify-center sm:justify-start sm:w-auto">← Back to Projects</button>
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">✨</span>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Daily Positive Affirmation</h2>
+                    <p class="text-purple-200 text-sm">Uses: arrow functions, DOMContentLoaded, fetch(), const</p>
+                </div>
+            </div>
+            
+            <div id="affirmationDisplay" class="bg-gradient-to-r from-pink-500/30 to-purple-500/30 rounded-xl p-6 min-h-24 flex items-center justify-center border border-pink-400/30">
+                <p class="text-white text-xl text-center font-medium italic" id="affirmationText">
+                    🌟 Loading your daily affirmation...
+                </p>
+            </div>
+            
+            <button 
+                id="newAffirmationBtn"
+                class="mt-4 w-full px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all transform hover:scale-105"
+            >
+                🔄 Get New Affirmation
+            </button>
+        </div>
+
+    </div>
+
+</body>
+</html>
