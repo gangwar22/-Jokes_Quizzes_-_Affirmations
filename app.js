@@ -1,7 +1,7 @@
 // API Configuration (ES6: const, template literals)
-const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 // Default key provided by user so they do not need to paste manually
-const DEFAULT_API_KEY = 'AIzaSyBbvUNkzQGFCor2Pki_G2Ls4qXFtxkThVs';
+const DEFAULT_API_KEY = 'AIzaSyAFJYw4rP1TxXwwcjH6Rovjty1Njj8IMcM';
 
 // ES6: Arrow function to get API key with default fallback
 const getApiKey = () => localStorage.getItem('geminiApiKey') || DEFAULT_API_KEY;
@@ -17,6 +17,8 @@ const jokeDisplay = document.getElementById('jokeDisplay');
 const quizTopic = document.getElementById('quizTopic');
 const quizContainer = document.getElementById('quizContainer');
 const affirmationText = document.getElementById('affirmationText');
+const pageTitle = document.getElementById('pageTitle');
+const pageDesc = document.getElementById('pageDesc');
 
 const projectsDashboard = document.getElementById('projectsDashboard');
 
@@ -26,6 +28,12 @@ const showDashboard = () => {
         document.querySelectorAll('.project-section').forEach(section => {
             section.classList.add('hidden');
         });
+        pageTitle.textContent = "Workspace";
+        pageDesc.textContent = "Manage your entertainment modules.";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Update sidebar active state
+        updateSidebarActive('dashboard');
     }
 };
 
@@ -37,10 +45,37 @@ const openProject = (project) => {
     const section = document.getElementById(`${project}Section`);
     if (section) {
         section.classList.remove('hidden');
+        
+        // Update Titles
+        const titles = {
+            joke: ["AI Jokebox", "Topic-driven algorithmic humor generation."],
+            quiz: ["Smart Quiz", "Dynamic knowledge assessment modules."],
+            affirmation: ["Mindfulness", "Curated daily affirmations for focus."]
+        };
+        [pageTitle.textContent, pageDesc.textContent] = titles[project];
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         if (project === 'affirmation') {
             fetchAffirmation();
         }
+        updateSidebarActive(project);
     }
+};
+
+const updateSidebarActive = (activeId) => {
+    const navButtons = document.querySelectorAll('#mainSidebar nav button');
+    navButtons.forEach(btn => {
+        const isDashboard = activeId === 'dashboard' && btn.textContent.includes('Dashboard');
+        const isJoke = activeId === 'joke' && btn.textContent.includes('Joke');
+        const isQuiz = activeId === 'quiz' && btn.textContent.includes('Quiz');
+        const isAffirmation = activeId === 'affirmation' && btn.textContent.includes('Affirmation');
+        
+        if (isDashboard || isJoke || isQuiz || isAffirmation) {
+            btn.className = "w-full h-12 flex items-center gap-4 px-4 rounded-xl bg-white/10 text-white font-bold transition-all";
+        } else {
+            btn.className = "w-full h-12 flex items-center gap-4 px-4 rounded-xl text-indigo-200/60 hover:text-white font-semibold transition-all hover:bg-white/5";
+        }
+    });
 };
 
 // Project teasers and back buttons
@@ -82,7 +117,10 @@ const saveApiKey = () => {
     }
 };
 
-document.getElementById('saveApiKey').addEventListener('click', saveApiKey);
+const saveApiKeyBtn = document.getElementById('saveApiKey');
+if (saveApiKeyBtn) {
+    saveApiKeyBtn.addEventListener('click', saveApiKey);
+}
 
 // Attempt to extract a JSON array from Gemini text output
 const extractJsonArray = (rawText) => {
@@ -169,14 +207,18 @@ const fetchJoke = async () => {
 
     const getPrompt = () => {
         jokeNonce += 1;
-        return `Give a short, simple, 4-line poem that is a really funny joke about "${topic}". Use very easy English. Make the joke silly, unexpected, and playful (like a cartoon moment). Create a fresh setup and a surprising punchline that makes people laugh fast. Keep the words simple so everyone understands. `;
+        return `Give a short, simple, funny joke about "${topic}". Respond in two parts separated by "---": 
+        1. The joke in simple English (4-6 lines/sentences). 
+        2. The EXACT SAME joke translated into Hindi (हिन्दी). 
+        Make it silly, unexpected, and playful. Keep the vocabulary simple.`;
     };
 
     const showLoading = () => {
         jokeDisplay.innerHTML = `
-            <div class="flex items-center gap-3 text-white">
+            <div class="flex flex-col items-center gap-3 text-white">
                 <div class="animate-spin h-6 w-6 border-2 border-white border-t-transparent rounded-full"></div>
-                <span>Thinking of something funny...</span>
+                <span class="font-medium">Thinking of something funny...</span>
+                <span class="text-xs text-indigo-300">कुकिंग अप अ जोक (Cooking up a joke)...</span>
             </div>
         `;
     };
@@ -186,21 +228,41 @@ const fetchJoke = async () => {
     let attempts = 0;
     while (attempts < 3) {
         try {
-            const joke = (await callGeminiAPI(getPrompt())).trim();
-            if (!joke) throw new Error('Empty response');
+            const response = await callGeminiAPI(getPrompt());
+            if (!response) throw new Error('Empty response');
 
-            const lowerJoke = joke.toLowerCase();
+            const [engJoke, hindiJoke] = response.split('---').map(s => s.trim());
+            
+            if (!engJoke || !hindiJoke) {
+                attempts++;
+                continue;
+            }
+
+            const lowerJoke = engJoke.toLowerCase();
             const hasBannedWord = bannedJokeWords.some(word => lowerJoke.includes(word));
-            if (hasBannedWord || recentJokes.includes(joke)) {
+            if (hasBannedWord || recentJokes.includes(engJoke)) {
                 attempts += 1;
                 continue; // try again for a different joke
             }
 
-            recentJokes.push(joke);
+            recentJokes.push(engJoke);
             if (recentJokes.length > 5) recentJokes.shift();
 
             jokeDisplay.innerHTML = `
-                <p class="text-white text-lg text-center">${joke}</p>
+                <div class="flex flex-col gap-8 w-full">
+                    <div class="relative">
+                         <span class="absolute -top-4 -left-2 text-4xl text-white/10 italic font-serif">"</span>
+                         <p class="text-white text-lg md:text-xl text-center leading-relaxed font-semibold italic relative z-10">
+                            ${engJoke.replace(/\n/g, '<br>')}
+                         </p>
+                    </div>
+                    <div class="h-px w-24 bg-gradient-to-r from-transparent via-white/20 to-transparent mx-auto"></div>
+                    <div class="relative">
+                         <p class="text-indigo-200 text-xl md:text-2xl text-center leading-relaxed font-bold font-sans relative z-10">
+                            ${hindiJoke.replace(/\n/g, '<br>')}
+                         </p>
+                    </div>
+                </div>
             `;
             return;
         } catch (error) {
@@ -278,46 +340,69 @@ Rules: only one correct option per question; keep questions short; options must 
 
 const displayQuiz = () => {
     quizContainer.innerHTML = `
-        <div class="max-w-3xl mx-auto">
-            <h3 class="text-2xl font-bold text-green-300 mb-6 text-center">5-MCQ Quiz: ${quizTopic.value}</h3>
-            <form id="quizForm" class="space-y-6">
+        <div class="max-w-4xl mx-auto py-4 md:py-8 px-0 sm:px-4">
+            <header class="text-center mb-8 md:mb-12">
+                <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] md:text-xs font-bold uppercase tracking-widest mb-3 inline-block">Active Assessment</span>
+                <h3 class="text-2xl md:text-4xl font-black text-white mb-4 tracking-tight capitalize">${quizTopic.value} Quiz</h3>
+                <div class="w-16 md:w-24 h-1 bg-emerald-500/30 mx-auto rounded-full"></div>
+            </header>
+
+            <form id="quizForm" class="space-y-6 md:space-y-8">
                 ${currentQuiz.map((q, index) => `
-                    <div class="bg-white/20 p-6 rounded-2xl border-2 border-green-500/50">
-                        <h4 class="text-xl font-semibold text-white mb-4">Q${index + 1}: ${q.question}</h4>
-                        <div class="space-y-3 text-lg">
-                            ${Object.entries(q.options).map(([key, opt]) => `
-                                <label class="block p-4 bg-white/10 hover:bg-white/20 rounded-xl cursor-pointer transition-all flex items-center border border-white/20 hover:border-green-400">
-                                    <input type="radio" name="q${index}" value="${key}" class="mr-4 w-6 h-6 text-green-500 focus:ring-green-400 accent-green-500">
-                                    <span class="font-medium">${key}) ${opt}</span>
-                                </label>
-                            `).join('')}
+                    <div class="glass-card p-5 md:p-10 rounded-2xl md:rounded-[32px] border border-white/5 relative overflow-hidden group animate-in slide-in-from-bottom-6 duration-700" style="animation-delay: ${index * 150}ms">
+                        <div class="absolute top-0 left-0 w-1 md:w-1.5 h-full bg-emerald-500/20 group-hover:bg-emerald-500/50 transition-colors"></div>
+                        
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-center gap-3">
+                                <span class="flex-shrink-0 w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-black text-sm md:text-lg">
+                                    ${index + 1}
+                                </span>
+                                <h4 class="text-lg md:text-2xl font-bold text-white leading-tight">${q.question}</h4>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-3 mt-2">
+                                ${Object.entries(q.options).map(([key, opt]) => `
+                                    <label class="relative group/opt cursor-pointer">
+                                        <input type="radio" name="q${index}" value="${key}" class="peer sr-only">
+                                        <div class="p-4 md:p-5 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 text-indigo-100 font-medium transition-all duration-300 peer-checked:bg-emerald-500/20 peer-checked:border-emerald-500/50 peer-checked:ring-2 peer-checked:ring-emerald-500/20 group-hover/opt:bg-white/10 group-hover/opt:border-white/20 flex items-center gap-3 md:gap-4">
+                                            <span class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-[10px] md:text-xs font-black text-indigo-300 peer-checked:bg-emerald-500/20 peer-checked:text-emerald-400 peer-checked:border-emerald-500/30 uppercase transition-all">
+                                                ${key}
+                                            </span>
+                                            <span class="flex-1 text-sm md:text-base">${opt}</span>
+                                        </div>
+                                    </label>
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
                 `).join('')}
             </form>
-            <div class="flex flex-col sm:flex-row gap-4 mt-8 pt-4 border-t border-white/20">
-                <button id="submitQuizBtn" type="button" class="flex-1 px-8 py-4 bg-gradient-to-r from-green-400 to-teal-500 text-gray-900 font-bold rounded-2xl hover:from-green-500 hover:to-teal-600 transition-all transform hover:scale-105 text-lg shadow-xl">
-                    ✅ Submit & Score
+
+            <div class="mt-12 md:mt-16 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
+                <button id="submitQuizBtn" type="button" class="btn-primary w-full md:w-auto px-10 md:px-12 py-4 md:py-5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl md:rounded-2xl shadow-2xl shadow-emerald-900/40 transition-all flex items-center justify-center gap-3 group">
+                    <span>Submit Assessment</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                 </button>
-                <button id="newQuizBtn" type="button" class="px-8 py-4 bg-gradient-to-r from-blue-400 to-indigo-500 text-white font-bold rounded-2xl hover:from-blue-500 hover:to-indigo-600 transition-all transform hover:scale-105 text-lg shadow-xl">
-                    🔄 Reset Form
+                <button id="newQuizBtn" type="button" class="w-full md:w-auto px-8 md:px-10 py-4 md:py-5 bg-white/5 hover:bg-white/10 text-indigo-200 hover:text-white font-bold rounded-xl md:rounded-2xl border border-white/10 transition-all">
+                    Reset Form
                 </button>
             </div>
-            <div id="resultsSection" class="mt-12 hidden">
-                <div id="scoreDisplay" class="text-center py-12 rounded-2xl bg-gradient-to-r from-green-500/20 to-teal-500/20 border-2 border-green-400/50 mb-8"></div>
-                <div id="quizResults" class="space-y-4"></div>
+
+            <div id="resultsSection" class="mt-20 hidden animate-in zoom-in-95 duration-1000">
+                <div id="scoreDisplay" class="glass-panel p-12 text-center relative overflow-hidden mb-12">
+                    <div class="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent pointer-events-none"></div>
+                    <!-- Content populated by displayResults -->
+                </div>
+                <div id="quizResults" class="space-y-6"></div>
             </div>
         </div>
     `;
 
-    // Dynamic event listeners (ES6 arrow functions)
     document.getElementById('submitQuizBtn').addEventListener('click', submitQuiz);
     document.getElementById('newQuizBtn').addEventListener('click', () => {
         document.getElementById('quizForm').reset();
-        const resultsSection = document.getElementById('resultsSection');
-        if (!resultsSection.classList.contains('hidden')) {
-            resultsSection.classList.add('hidden');
-        }
+        document.getElementById('resultsSection').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 };
 
@@ -388,7 +473,16 @@ const displayResults = () => {
 };
 
 // Event listeners
-document.getElementById('getQuizBtn').addEventListener('click', fetchQuiz);
+const generateQuizBtn = document.getElementById('generateQuizBtn');
+if (generateQuizBtn) {
+    generateQuizBtn.addEventListener('click', fetchQuiz);
+}
+// Keep getQuizBtn as fallback if needed but focus on the new one
+const getQuizBtn = document.getElementById('getQuizBtn');
+if (getQuizBtn) {
+    getQuizBtn.addEventListener('click', fetchQuiz);
+}
+
 quizTopic.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') fetchQuiz();
 });
@@ -402,9 +496,9 @@ const fetchAffirmation = async () => {
         return;
     }
 
-    const prompt = `Give me a unique, uplifting, one-sentence positive affirmation. 
+    const prompt = `Give me EXACTLY ONE unique, uplifting, one-sentence positive affirmation. 
     Make it personal (use "you" or "I"), inspiring, and suitable for starting the day. 
-    Just the affirmation, no quotes, no attribution, nothing else.`;
+    Respond with ONLY the text of that one affirmation. No choices, no list, no quotes, no attribution.`;
 
     affirmationText.innerHTML = `
         <span class="flex items-center gap-2">
@@ -421,7 +515,14 @@ const fetchAffirmation = async () => {
     }
 };
 
-document.getElementById('newAffirmationBtn').addEventListener('click', fetchAffirmation);
+const refreshAffirmation = document.getElementById('refreshAffirmation');
+if (refreshAffirmation) {
+    refreshAffirmation.addEventListener('click', fetchAffirmation);
+}
+const newAffirmationBtn = document.getElementById('newAffirmationBtn');
+if (newAffirmationBtn) {
+    newAffirmationBtn.addEventListener('click', fetchAffirmation);
+}
 
 // Auto-load on page load (ES6: DOMContentLoaded)
 document.addEventListener('DOMContentLoaded', () => {

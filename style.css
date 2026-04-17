@@ -1,17 +1,141 @@
 :root {
-    --app-font: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
+    --app-font: "Inter", system-ui, -apple-system, sans-serif;
+    --brand-primary: #6366f1;
+    --brand-secondary: #ec4899;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(12px);
 }
 
 body {
     font-family: var(--app-font);
+    background: #0f172a; /* Solid dark blue for stability */
+    background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+    color: #f8fafc;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    overflow-x: hidden;
 }
 
-/* Slow rotation for the sparkle icon */
+/* Glassmorphism System */
+.glass-panel {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Typography Enhancements */
+h1 {
+    letter-spacing: -0.025em;
+    background: linear-gradient(to right, #fff, #a5b4fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* High-end Animations */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
 .slow-spin {
-    animation: spin 6s linear infinite;
+    animation: rotate 12s linear infinite;
 }
 
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+/* Mobile-Specific Refinements */
+@media (max-width: 768px) {
+    aside {
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+    }
+    
+    .glass-panel {
+        border-radius: 20px;
+        padding: 1.25rem !important;
+    }
+
+    button, input {
+        font-size: 14px !important;
+    }
+
+    h2 {
+        font-size: 2rem !important;
+    }
+    
+    /* Remove hover scale on mobile to prevent sticky touch states */
+    .glass-card:hover {
+        transform: none;
+    }
+}
 
 .project-section.hidden {
     display: none;
+}
+
+/* Premium Button States */
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-primary::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(45deg);
+    transition: 0.5s;
+    opacity: 0;
+}
+
+.btn-primary:hover::after {
+    left: 120%;
+    opacity: 1;
 }

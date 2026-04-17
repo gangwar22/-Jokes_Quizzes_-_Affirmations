@@ -8,139 +8,172 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="app.js" defer></script>
 </head>
-<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 min-h-screen p-6">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-4xl font-bold text-white text-center mb-2">AI Fun Hub: Jokes, Quizzes & Affirmations</h1>
-        <p class="text-purple-200 text-center mb-8">Three mini tools: jokes by category, MCQ quizzes on any topic, and daily affirmations</p>
+<body class="selection:bg-indigo-500/30 selection:text-white flex flex-col md:flex-row min-h-screen">
+    <div class="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.1),transparent_40%)] pointer-events-none"></div>
 
-        <!-- API Key Input -->
-        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-white/20">
-            <h2 class="text-xl font-semibold text-white mb-3">🔑 API Configuration</h2>
-            <div class="flex gap-3">
-                <input 
-                    type="password" 
-                    id="apiKeyInput" 
-                    placeholder="Enter your Gemini API key..."
-                    class="flex-1 px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                >
-                <button 
-                    id="saveApiKey"
-                    class="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all"
-                >
-                    Save Key
-                </button>
+    <!-- Enhanced Sidebar Navigation -->
+    <aside id="mainSidebar" class="w-full md:w-20 lg:w-72 md:h-screen sticky top-0 bg-white/5 backdrop-blur-2xl border-b md:border-b-0 md:border-r border-white/10 p-4 md:p-6 flex flex-row md:flex-col items-center md:items-stretch transition-all duration-500 z-50">
+        <div class="flex items-center gap-4 mb-0 md:mb-12 mr-auto md:mr-0">
+            <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
             </div>
-            <p id="apiStatus" class="text-sm text-purple-300 mt-2"></p>
+            <h1 class="text-lg md:text-xl font-black tracking-tight text-white hidden lg:block uppercase italic">Fun Hub</h1>
         </div>
 
-        <!-- Projects Dashboard -->
-        <div id="projectsDashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 bg-white/5 backdrop-blur rounded-2xl p-8 border border-white/10">
-            <button class="project-teaser bg-gradient-to-r from-yellow-400/20 via-orange-400/20 backdrop-blur-xl rounded-3xl p-8 border-2 border-yellow-400/30 hover:border-yellow-400 hover:from-yellow-500/30 hover:to-orange-500/30 hover:scale-[1.02] transition-all duration-300 shadow-2xl hover:shadow-yellow-500/20 text-center flex flex-col items-center justify-center min-h-[220px] text-white" data-project="joke">
-                <span class="text-6xl mb-6 animate-bounce">😂</span>
-                <h3 class="text-2xl font-bold mb-3 drop-shadow-2xl">AI Joke Generator</h3>
-                <p class="text-purple-200 text-lg max-w-[200px] leading-relaxed">Get clean, funny jokes by category!</p>
+        <nav class="flex flex-row md:flex-col flex-1 justify-center md:justify-start gap-2 md:space-y-3">
+            <button onclick="showDashboard()" class="p-2 md:w-full md:h-12 flex items-center gap-4 md:px-4 rounded-xl bg-white/10 text-white font-bold transition-all hover:bg-white/20" title="Dashboard">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                <span class="hidden lg:block">Dashboard</span>
             </button>
-            <button class="project-teaser bg-gradient-to-r from-green-400/20 via-teal-400/20 backdrop-blur-xl rounded-3xl p-8 border-2 border-green-400/30 hover:border-green-400 hover:from-green-500/30 hover:to-teal-500/30 hover:scale-[1.02] transition-all duration-300 shadow-2xl hover:shadow-emerald-500/20 text-center flex flex-col items-center justify-center min-h-[220px] text-white" data-project="quiz">
-                <span class="text-6xl mb-6 animate-pulse">🧠</span>
-                <h3 class="text-2xl font-bold mb-3 drop-shadow-2xl">5-MCQ Quiz Generator</h3>
-                <p class="text-purple-200 text-lg max-w-[200px] leading-relaxed">Generate quizzes in multiple languages!</p>
+            <button onclick="openProject('joke')" class="p-2 md:w-full md:h-12 flex items-center gap-4 md:px-4 rounded-xl text-indigo-200/60 hover:text-white font-semibold transition-all hover:bg-white/5" title="Joke Generator">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span class="hidden lg:block">Joke Generator</span>
             </button>
-            <button class="project-teaser bg-gradient-to-r from-pink-500/20 via-purple-500/20 backdrop-blur-xl rounded-3xl p-8 border-2 border-pink-400/30 hover:border-pink-400 hover:from-pink-600/30 hover:to-purple-600/30 hover:scale-[1.02] transition-all duration-300 shadow-2xl hover:shadow-pink-500/20 text-center flex flex-col items-center justify-center min-h-[220px] text-white" data-project="affirmation">
-                <span class="text-6xl mb-6 animate-spin slow-spin">✨</span>
-                <h3 class="text-2xl font-bold mb-3 drop-shadow-2xl">Daily Positive Affirmation</h3>
-                <p class="text-purple-200 text-lg max-w-[200px] leading-relaxed">Uplifting daily motivation!</p>
+            <button onclick="openProject('quiz')" class="p-2 md:w-full md:h-12 flex items-center gap-4 md:px-4 rounded-xl text-indigo-200/60 hover:text-white font-semibold transition-all hover:bg-white/5" title="Smart Quiz">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.674a1 1 0 00.922-.606l7-15A1 1 0 0021.337 0H2.663a1 1 0 00-.922 1.394l7 15a1 1 0 00.922.606z" /></svg>
+                <span class="hidden lg:block">Smart Quiz</span>
             </button>
-        </div>
+            <button onclick="openProject('affirmation')" class="p-2 md:w-full md:h-12 flex items-center gap-4 md:px-4 rounded-xl text-indigo-200/60 hover:text-white font-semibold transition-all hover:bg-white/5" title="Affirmations">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
+                <span class="hidden lg:block">Affirmations</span>
+            </button>
+        </nav>
 
-        <!-- Project 1: AI Joke Generator -->
-        <div id="jokeSection" class="project-section bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-white/20 hidden">
-            <button class="back-btn mb-6 px-6 py-3 w-full bg-white/20 backdrop-blur border border-white/30 text-white font-semibold rounded-xl hover:bg-white/30 hover:border-white/40 transition-all shadow-md hover:shadow-lg flex items-center gap-3 justify-center sm:justify-start sm:w-auto">← Back to Projects</button>
-            <div class="flex items-center gap-3 mb-4">
-                <span class="text-4xl">😂</span>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">AI Joke Generator</h2>
-                    <p class="text-purple-200 text-sm">Uses: const, arrow functions, template literals, fetch()</p>
+        <div class="hidden md:block mt-auto pt-6 border-t border-white/5">
+            <div class="flex items-center gap-3 lg:bg-white/5 lg:p-3 rounded-2xl">
+                <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">M</div>
+                <div class="hidden lg:block overflow-hidden">
+                    <p class="text-xs font-bold text-white truncate">Guest User</p>
+                    <p class="text-[10px] text-indigo-300/50 truncate">Gemini Active</p>
                 </div>
             </div>
-            
-            <div class="flex gap-3 mb-4 flex-wrap items-end">
-                <input 
-                    type="text"
-                    id="jokeTopic"
-                    placeholder="Enter any topic (e.g., JavaScript, cats, space)..."
-                    aria-label="Joke topic"
-                    class="flex-1 px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-400 min-w-[240px]"
-                >
-                <button 
-                    id="getJokeBtn"
-                    class="px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-bold rounded-xl hover:from-yellow-500 hover:to-orange-600 transition-all transform hover:scale-105"
-                >
-                    🎭 Get a Joke!
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto h-screen p-4 sm:p-6 md:p-12 lg:p-16">
+        <div class="max-w-6xl mx-auto">
+            <header class="flex flex-col md:flex-row md:items-center justify-between mb-8 md:mb-12 gap-5">
+                <div>
+                    <h2 id="pageTitle" class="text-2xl sm:text-3xl md:text-5xl font-black text-white tracking-tight mb-2">Workspace</h2>
+                    <p id="pageDesc" class="text-xs sm:text-sm md:text-base text-indigo-200/40 font-medium">Manage your entertainment modules.</p>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button title="Notifications" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    </button>
+                    <button class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-indigo-600/20">Upgrade Pro</button>
+                </div>
+            </header>
+
+            <div id="projectsDashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                <!-- Cards remain similar but with improved interaction labels -->
+                <button class="project-teaser glass-card group text-left p-6 md:p-10 flex flex-col h-full ring-1 ring-white/5 relative overflow-hidden" data-project="joke">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 blur-3xl group-hover:bg-amber-500/10 transition-colors"></div>
+                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-amber-500/20 flex items-center justify-center mb-6 md:mb-8 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                        <span class="text-3xl md:text-4xl filter drop-shadow-md">😂</span>
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-black mb-4 text-white font-sans tracking-tight">AI Jokebox</h3>
+                    <p class="text-sm md:text-base text-indigo-200/60 leading-relaxed mb-8 md:mb-10 flex-grow font-medium">Advanced LLM-driven comedy tailoring jokes to any topic instantly.</p>
+                    <div class="flex items-center gap-2 text-amber-400 font-bold text-xs md:text-sm tracking-wider uppercase">
+                        Run Application
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </div>
+                </button>
+
+                <button class="project-teaser glass-card group text-left p-6 md:p-10 flex flex-col h-full ring-1 ring-white/5 relative overflow-hidden" data-project="quiz">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-3xl group-hover:bg-emerald-500/10 transition-colors"></div>
+                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center mb-6 md:mb-8 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
+                        <span class="text-3xl md:text-4xl filter drop-shadow-md">🧠</span>
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-black mb-4 text-white font-sans tracking-tight">Smart Quiz</h3>
+                    <p class="text-sm md:text-base text-indigo-200/60 leading-relaxed mb-8 md:mb-10 flex-grow font-medium">Dynamic assessment system that generates multi-language quizzes on any subject.</p>
+                    <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs md:text-sm tracking-wider uppercase">
+                        Launch System
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </div>
+                </button>
+
+                <button class="project-teaser glass-card group text-left p-6 md:p-10 flex flex-col h-full ring-1 ring-white/5 relative overflow-hidden" data-project="affirmation">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-pink-500/5 blur-3xl group-hover:bg-pink-500/10 transition-colors"></div>
+                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-pink-500/20 flex items-center justify-center mb-6 md:mb-8 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
+                        <span class="text-3xl md:text-4xl filter drop-shadow-md">✨</span>
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-black mb-4 text-white font-sans tracking-tight">Mindfulness</h3>
+                    <p class="text-sm md:text-base text-indigo-200/60 leading-relaxed mb-8 md:mb-10 flex-grow font-medium">Curated daily affirmations designed to prime your mindset for success.</p>
+                    <div class="flex items-center gap-2 text-pink-400 font-bold text-xs md:text-sm tracking-wider uppercase">
+                        Enter Workspace
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </div>
                 </button>
             </div>
-            
-            <div id="jokeDisplay" class="bg-white/10 rounded-xl p-5 min-h-24 flex items-center justify-center">
-                <p class="text-white text-lg text-center italic">Click the button to get a joke!</p>
-            </div>
-        </div>
 
-        <!-- Project 2: 5-MCQ Quiz Generator -->
-        <div id="quizSection" class="project-section bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-white/20 hidden">
-            <button class="back-btn mb-6 px-6 py-3 w-full bg-white/20 backdrop-blur border border-white/30 text-white font-semibold rounded-xl hover:bg-white/30 hover:border-white/40 transition-all shadow-md hover:shadow-lg flex items-center gap-3 justify-center sm:justify-start sm:w-auto">← Back to Projects</button>
-            <div class="flex items-center gap-3 mb-4">
-                <span class="text-4xl">🧠</span>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">5-MCQ Quiz Generator</h2>
-                    <p class="text-purple-200 text-sm">Uses: let/const, arrays (.map(), .reduce()), Object.entries(), template literals, fetch(), destructuring</p>
+            <div id="activeContent">
+                <!-- Project 1: AI Joke Generator (Updated UI) -->
+                <div id="jokeSection" class="project-section glass-panel p-6 md:p-12 mb-6 hidden animate-in zoom-in-95 duration-500">
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8 md:mb-10 bg-white/5 p-2 rounded-2xl border border-white/5 shadow-inner">
+                        <input 
+                            type="text"
+                            id="jokeTopic"
+                            placeholder="What's the topic? (e.g., Coding, Cats)..."
+                            class="flex-1 bg-transparent px-4 md:px-6 py-3 md:py-4 text-white placeholder-white/20 focus:outline-none text-sm md:text-base"
+                        >
+                        <button 
+                            id="getJokeBtn"
+                            class="btn-primary px-6 md:px-8 py-3 md:py-4 bg-amber-500 hover:bg-amber-400 text-gray-900 font-black rounded-xl transition-all shadow-xl shadow-amber-500/20 active:scale-95 text-sm md:text-base"
+                        >
+                            Generate
+                        </button>
+                    </div>
+                    
+                    <div id="jokeDisplay" class="bg-indigo-950/40 rounded-[2rem] p-6 md:p-10 min-h-[150px] md:min-h-[200px] border border-white/5 flex items-center justify-center relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <p class="text-white text-lg md:text-2xl text-center leading-relaxed font-medium relative z-10 italic">Your joke will appear here...</p>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div id="quizSection" class="project-section glass-panel p-6 md:p-12 mb-6 hidden animate-in zoom-in-95 duration-500">
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8 md:mb-10 bg-white/5 p-2 rounded-2xl border border-white/5">
+                        <input 
+                            type="text"
+                            id="quizTopic"
+                            placeholder="Quiz topic? (e.g., History, Movies)..."
+                            class="flex-1 bg-transparent px-4 md:px-6 py-3 md:py-4 text-white placeholder-white/20 focus:outline-none text-sm md:text-base"
+                        >
+                        <button 
+                            id="generateQuizBtn"
+                            class="btn-primary px-6 md:px-8 py-3 md:py-4 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black rounded-xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 text-sm md:text-base"
+                        >
+                            Create Quiz
+                        </button>
+                    </div>
+                    <div id="quizContainer" class="space-y-6"></div>
+                </div>
+
+                <!-- Affirmation Section -->
+                <div id="affirmationSection" class="project-section glass-panel p-6 md:p-12 mb-6 hidden animate-in zoom-in-95 duration-500">
+                    <div class="max-w-3xl mx-auto text-center py-6 md:py-10">
+                        <div class="relative px-6 py-12 md:px-8 md:py-16 bg-white/5 rounded-[2.5rem] border border-white/10 overflow-hidden">
+                            <div class="absolute -top-10 -left-10 w-32 h-32 bg-pink-500/20 blur-3xl"></div>
+                            <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-indigo-500/20 blur-3xl"></div>
+                            <p id="affirmationText" class="text-xl md:text-4xl font-black text-white leading-tight mb-8 relative z-10">Calming your mind...</p>
+                            <button id="refreshAffirmation" class="relative z-10 px-8 py-3 md:px-10 md:py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl transition-all active:scale-95 backdrop-blur-md text-sm md:text-base">Next Affirmation</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <div class="flex gap-3 mb-4 flex-wrap items-end">
-                <input 
-                    type="text" 
-                    id="quizTopic" 
-                    placeholder="Enter a topic (e.g., Photosynthesis, JavaScript, History)..."
-                    class="flex-1 px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 min-w-[250px]"
-                >
-                <button 
-                    id="getQuizBtn"
-                    class="px-6 py-3 bg-gradient-to-r from-green-400 to-teal-500 text-gray-900 font-bold rounded-xl hover:from-green-500 hover:to-teal-600 transition-all transform hover:scale-105"
-                >
-                    📝 Generate 5-MCQ Quiz
-                </button>
-            </div>
-            
-            <div id="quizContainer" class="bg-white/10 rounded-xl p-6 min-h-[600px]">
-                <div class="text-center text-purple-200 italic py-[150px]">Choose a language, enter a topic, and generate your 5-MCQ quiz!</div>
-            </div>
-        </div>
 
-        <!-- Project 3: Daily Affirmation -->
-        <div id="affirmationSection" class="project-section bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hidden">
-            <button class="back-btn mb-6 px-6 py-3 w-full bg-white/20 backdrop-blur border border-white/30 text-white font-semibold rounded-xl hover:bg-white/30 hover:border-white/40 transition-all shadow-md hover:shadow-lg flex items-center gap-3 justify-center sm:justify-start sm:w-auto">← Back to Projects</button>
-            <div class="flex items-center gap-3 mb-4">
-                <span class="text-4xl">✨</span>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Daily Positive Affirmation</h2>
-                    <p class="text-purple-200 text-sm">Uses: arrow functions, DOMContentLoaded, fetch(), const</p>
+            <!-- Footer integrated into main -->
+            <footer class="mt-20 py-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-indigo-200/30 text-sm font-medium italic">Powered by Gemini Fast Model 2.5</p>
+                <div class="flex gap-8">
+                    <a href="#" class="text-xs text-indigo-200/20 hover:text-indigo-200/50 transition-colors">Documentation</a>
+                    <a href="#" class="text-xs text-indigo-200/20 hover:text-indigo-200/50 transition-colors">API Keys</a>
+                    <a href="#" class="text-xs text-indigo-200/20 hover:text-indigo-200/50 transition-colors">Privacy</a>
                 </div>
-            </div>
-            
-            <div id="affirmationDisplay" class="bg-gradient-to-r from-pink-500/30 to-purple-500/30 rounded-xl p-6 min-h-24 flex items-center justify-center border border-pink-400/30">
-                <p class="text-white text-xl text-center font-medium italic" id="affirmationText">
-                    🌟 Loading your daily affirmation...
-                </p>
-            </div>
-            
-            <button 
-                id="newAffirmationBtn"
-                class="mt-4 w-full px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all transform hover:scale-105"
-            >
-                🔄 Get New Affirmation
-            </button>
+            </footer>
         </div>
-
-    </div>
-
+    </main>
 </body>
 </html>
